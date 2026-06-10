@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>玄象 · 传统文化智能工具集</title>
+  <link rel="stylesheet" href="/shared/minimalist-v5.css">
+  <script defer src="/frontend/app-v4-cardkey.js?v=5"></script>
+</head>
+<body>
+  <!-- 头部 -->
+  <header class="header">
+    <div class="container">
+      <h1 class="logo">玄象</h1>
+      <p class="tagline">X u a n · X i a n g</p>
+      <nav class="nav">
+        <a href="#" class="nav-link" onclick="event.preventDefault()">登录</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 主标语 -->
+  <section class="hero">
+    <div class="container">
+      <h2 class="hero-title">古智新解，玄机自现</h2>
+      <p class="hero-subtitle">已有 <span id="totalUsers">0</span> 位用户在此探索传统智慧</p>
+    </div>
+  </section>
+
+  <!-- 功能卡片网格 -->
+  <main class="main">
+    <div class="container">
+      
+      <!-- 八字分析 -->
+      <article class="card" data-service="bazi">
+        <div class="card-icon">八</div>
+        <h3 class="card-title">八字精批</h3>
+        <p class="card-desc">依据出生信息排四柱，查看流年、姻缘、财运等解读</p>
+      </article>
+
+      <!-- 姓名分析 -->
+      <article class="card" data-service="naming">
+        <div class="card-icon">名</div>
+        <h3 class="card-title">起名测名</h3>
+        <p class="card-desc">以八字喜用神为主、三才五格为辅，为宝宝起名、为姓名测算评分</p>
+      </article>
+
+      <!-- 周公解梦 -->
+      <article class="card" data-service="dream">
+        <div class="card-icon">梦</div>
+        <h3 class="card-title">周公解梦</h3>
+        <p class="card-desc">结合梦境细节与传统梦象，生成梦境文化解读</p>
+      </article>
+
+      <!-- 心理陪伴 -->
+      <article class="card" data-service="psychology" onclick="navigateToService('psychology')">
+        <div class="card-icon">💗</div>
+        <h3 class="card-title">心理陪伴</h3>
+        <p class="card-desc">温暖倾听，情绪陪伴，提供心理支持与生活建议</p>
+        <span class="card-badge">NEW</span>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 玄象 · 命理仅供参考，人生在于自我把握</p>
+    </div>
+  </footer>
+
+</body>
+</html>

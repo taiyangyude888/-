@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>玄象管理后台</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; }
+    
+    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    
+    .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
+    
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .tab { padding: 10px 20px; background: #f0f0f0; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
+    .tab:hover { background: #e0e0e0; }
+    .tab.active { background: #667eea; color: white; }
+    
+    .panel { display: none; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .panel.active { display: block; }
+    
+    .section { margin-bottom: 30px; }
+    .section h3 { font-size: 18px; color: #333; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+    
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #555; font-size: 14px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; transition: border 0.3s; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+    .form-group textarea { min-height: 120px; font-family: monospace; }
+    .form-group small { display: block; margin-top: 5px; color: #999; font-size: 12px; }
+    
+    .btn { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; }
+    .btn:hover { background: #5568d3; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3); }
+    .btn-danger { background: #e74c3c; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-success { background: #27ae60; }
+    .btn-success:hover { background: #229954; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
+    .stat-card h4 { font-size: 14px; opacity: 0.9; margin-bottom: 8px; }
+    .stat-card .number { font-size: 32px; font-weight: bold; }
+    
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+    table th { background: #f8f9fa; font-weight: 600; color: #555; font-size: 13px; }
+    table tr:hover { background: #f8f9fa; }
+    
+    .alert { padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    
+    .file-editor { display: flex; gap: 15px; }
+    .file-list { width: 250px; background: #f8f9fa; padding: 15px; border-radius: 6px; max-height: 600px; overflow-y: auto; }
+    .file-item { padding: 10px; margin-bottom: 8px; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .file-item:hover { background: #667eea; color: white; }
+    .file-item.active { background: #667eea; color: white; }
+    .editor-area { flex: 1; }
+    
+    .code-editor { width: 100%; min-height: 500px; padding: 15px; font-family: 'Courier New', monospace; font-size: 13px; border: 1px solid #ddd; border-radius: 6px; background: #282c34; color: #abb2bf; }
+    
+    .loading { text-align: center; padding: 40px; color: #999; }
+  </style>
+</head>
+<body>
+  <!-- 登录界面 -->
+  <div id="loginScreen" style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 400px; width: 90%;">
+      <h2 style="margin: 0 0 10px; text-align: center; color: #333;">🔐 管理后台登录</h2>
+      <p style="text-align: center; color: #999; margin-bottom: 30px; font-size: 14px;">玄象 v4.0</p>
+      <form onsubmit="adminLogin(event)">
+        <input type="password" id="adminPassword" placeholder="请输入管理密码" required style="width: 100%; padding: 14px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;" />
+        <button type="submit" id="loginBtn" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">登录</button>
+      </form>
+      <p id="loginError" style="margin-top: 15px; text-align: center; color: #ff4d4f; font-size: 13px;"></p>
+    </div>
+  </div>
+
+  <!-- 主界面 -->
+  <div id="mainScreen" style="display: none;">
+  <div class="header">
+    <h1>⚙️ 玄象管理后台</h1>
+    <p>完整的系统配置和内容管理</p>
+    <button onclick="adminLogout()" style="position: absolute; top: 20px; right: 20px; padding: 8px 16px; background: #ff4d4f; color: white; border: none; border-radius: 6px; cursor: pointer;">退出登录</button>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('dashboard')">📊 仪表盘</button>
+      <button class="tab" onclick="switchTab('cardkey')">🎫 卡密管理</button>
+      <button class="tab" onclick="switchTab('config')">⚙️ 系统配置</button>
+      <button class="tab" onclick="switchTab('files')">📁 文件管理</button>
+      <button class="tab" onclick="switchTab('orders')">📋 订单管理</button>
+      <button class="tab" onclick="switchTab('tools')">🛠️ 工具</button>
+    </div>
+
+    <!-- 仪表盘 -->
+    <div id="dashboard" class="panel active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h4>总用户数</h4>
+          <div class="number" id="totalUsers">-</div>
+        </div>
+        <div class="stat-card">
+          <h4>总订单数</h4>
+          <div class="number" id="totalOrders">-</div>
+        </div>
+        <div class="stat-card">
+          <h4>今日订单</h4>
+          <div class="number" id="todayOrders">-</div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>最近订单</h3>
+        <div class="table-container">
+          <table id="recentOrdersTable">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>类型</th>
+                <th>用户</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrders">
+              <tr><td colspan="4" class="loading">加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 卡密管理 -->
+    <div id="cardkey" class="panel">
+      <div id="cardkeyAlert"></div>
+      
+      <div class="section">
+        <h3>生成卡密</h3>
+        <div class="form-group">
+          <label>卡密类型</label>
+          <select id="cardkeyType">
+            <option value="7days">体验卡（7天）- ¥9.9</option>
+            <option value="30days">月度卡（30天）- ¥29.9</option>
+            <option value="365days">年度卡（365天）- ¥99</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>生成数量</label>
+          <input type="number" id="cardkeyCount" value="1" min="1" max="100" />
+        </div>
+        <button class="btn" onclick="generateCardkeys()">🎫 生成卡密</button>
+      </div>
+
+      <div class="section">
+        <h3>卡密列表</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>卡密</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>过期时间</th>
+                <th>激活时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="cardkeyList">
+              <tr><td colspan="6" class="loading">加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 系统配置 -->
+    <div id="config" class="panel">
+      <div id="configAlert"></div>
+      
+      <div class="section">
+        <h3>AI服务配置</h3>
+        <div class="form-group">
+          <label>API地址</label>
+          <input type="text" id="apiUrl" placeholder="https://api.openai.com/v1/chat/completions">
+          <small>OpenAI兼容的API端点</small>
+        </div>
+        <div class="form-group">
+          <label>API密钥</label>
+          <input type="password" id="apiKey" placeholder="sk-...">
+          <small>你的API密钥，留空则不修改</small>
+        </div>
+        <div class="form-group">
+          <label>模型名称</label>
+          <input type="text" id="apiModel" placeholder="gpt-4">
+          <small>使用的AI模型</small>
+        </div>
+        <button class="btn" onclick="saveConfig()">💾 保存配置</button>
+      </div>
+      
+      <div class="section">
+        <h3>收款配置</h3>
+        <div class="form-group">
+          <label>收款微信号</label>
+          <input type="text" id="paymentWechat" placeholder="留空使用默认">
+          <small>用户购买时显示的微信号，留空则在前端代码中硬编码</small>
+        </div>
+        <div class="form-group">
+          <label>收款二维码</label>
+          <input type="file" id="paymentQrcode" accept="image/*" onchange="previewQrcode(this)">
+          <small>上传微信/支付宝收款二维码，留空则不显示</small>
+          <div id="qrcodePreview" style="margin-top: 10px;"></div>
+        </div>
+        <button class="btn" onclick="savePaymentConfig()">💾 保存收款配置</button>
+      </div>
+    </div>
+
+    <!-- 文件管理 -->
+    <div id="files" class="panel">
+      <div id="fileAlert"></div>
+      
+      <div class="section">
+        <h3>编辑文件</h3>
+        <div class="file-editor">
+          <div class="file-list">
+            <div class="file-item" onclick="loadFile('index.php')">index.php</div>
+            <div class="file-item" onclick="loadFile('config.php')">config.php</div>
+            <div class="file-item" onclick="loadFile('.env')">.env</div>
+            <div class="file-item" onclick="loadFile('frontend/index.html')">frontend/index.html</div>
+            <div class="file-item" onclick="loadFile('frontend/app-v4.js')">frontend/app-v4.js</div>
+            <div class="file-item" onclick="loadFile('shared/styles-v4.css')">shared/styles-v4.css</div>
+            <div class="file-item" onclick="loadFile('api/bazi-analyze.php')">api/bazi-analyze.php</div>
+            <div class="file-item" onclick="loadFile('api/name-analyze.php')">api/name-analyze.php</div>
+            <div class="file-item" onclick="loadFile('api/dream-interpret.php')">api/dream-interpret.php</div>
+          </div>
+          <div class="editor-area">
+            <div class="form-group">
+              <label>当前文件: <span id="currentFile">未选择</span></label>
+              <textarea class="code-editor" id="fileContent" placeholder="选择左侧文件开始编辑..."></textarea>
+            </div>
+            <button class="btn" onclick="saveFile()">💾 保存文件</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单管理 -->
+    <div id="orders" class="panel">
+      <div class="section">
+        <h3>所有订单</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>订单ID</th>
+                <th>时间</th>
+                <th>类型</th>
+                <th>用户</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="allOrders">
+              <tr><td colspan="6" class="loading">加载中...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 工具 -->
+    <div id="tools" class="panel">
+      <div class="section">
+        <h3>系统工具</h3>
+        
+        <div class="form-group">
+          <label>清空所有订单</label>
+          <button class="btn btn-danger" onclick="clearOrders()">🗑️ 清空订单数据</button>
+          <small>⚠️ 此操作不可恢复</small>
+        </div>
+        
+        <div class="form-group">
+          <label>测试API连接</label>
+          <button class="btn" onclick="testAPI()">🔌 测试连接</button>
+          <div id="testResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentEditFile = '';
+
+    // 切换标签
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById(tabName).classList.add('active');
+      
+      if (tabName === 'dashboard') loadDashboard();
+      if (tabName === 'orders') loadAllOrders();
+      if (tabName === 'config') loadConfigData();
+      if (tabName === 'cardkey') loadCardkeys();
+    }
+
+    // 加载仪表盘
+    async function loadDashboard() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        document.getElementById('totalUsers').textContent = data.totalUsers;
+        document.getElementById('totalOrders').textContent = data.totalOrders;
+        document.getElementById('todayOrders').textContent = data.todayOrders;
+        
+        const tbody = document.getElementById('recentOrders');
+        tbody.innerHTML = data.recentOrders.map(o => `
+          <tr>
+            <td>${new Date(o.timestamp).toLocaleString('zh-CN')}</td>
+            <td>${getTypeName(o.type)}</td>
+            <td>${o.userName}</td>
+            <td><span style="color: #27ae60">✓ ${o.status}</span></td>
+          </tr>
+        `).join('') || '<tr><td colspan="4">暂无订单</td></tr>';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 加载配置
+    async function loadConfigData() {
+      try {
+        const res = await fetch('/admin/api.php?action=getConfig');
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('apiUrl').value = data.config.AI_API_URL || '';
+          document.getElementById('apiModel').value = data.config.AI_MODEL || '';
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 保存配置
+    async function saveConfig() {
+      const config = {
+        AI_API_URL: document.getElementById('apiUrl').value,
+        AI_API_KEY: document.getElementById('apiKey').value,
+        AI_MODEL: document.getElementById('apiModel').value
+      };
+      
+      try {
+        const res = await fetch('/admin/api.php?action=saveConfig', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+        const data = await res.json();
+        showAlert('configAlert', data.success ? 'success' : 'error', data.message);
+        if (data.success) {
+          document.getElementById('apiKey').value = '';
+        }
+      } catch (e) {
+        showAlert('configAlert', 'error', '保存失败: ' + e.message);
+      }
+    }
+    
+    // 预览二维码
+    function previewQrcode(input) {
+      const preview = document.getElementById('qrcodePreview');
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; border: 1px solid #ddd; border-radius: 8px;">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    
+    // 保存收款配置
+    async function savePaymentConfig() {
+      const wechat = document.getElementById('paymentWechat').value.trim();
+      const qrcodeFile = document.getElementById('paymentQrcode').files[0];
+      
+      // 保存微信号到配置
+      if (wechat) {
+        try {
+          const config = { PAYMENT_WECHAT: wechat };
+          await fetch('/admin/api.php?action=saveConfig', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(config)
+          });
+        } catch (e) {
+          showAlert('configAlert', 'error', '保存微信号失败');
+          return;
+        }
+      }
+      
+      // 上传二维码图片
+      if (qrcodeFile) {
+        const formData = new FormData();
+        formData.append('file', qrcodeFile);
+        formData.append('path', 'shared/payment-qrcode.jpg');
+        
+        try {
+          const res = await fetch('/admin/api.php?action=uploadFile', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          showAlert('configAlert', data.success ? 'success' : 'error', 
+            data.success ? '收款配置保存成功！' : '上传失败: ' + data.message);
+        } catch (e) {
+          showAlert('configAlert', 'error', '上传失败: ' + e.message);
+        }
+      } else if (wechat) {
+        showAlert('configAlert', 'success', '微信号保存成功！');
+      } else {
+        showAlert('configAlert', 'warning', '请填写微信号或上传二维码');
+      }
+    }
+
+    // 加载文件
+    async function loadFile(filename) {
+      currentEditFile = filename;
+      document.querySelectorAll('.file-item').forEach(f => f.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('currentFile').textContent = filename;
+      
+      try {
+        const res = await fetch('/admin/api.php?action=readFile&file=' + encodeURIComponent(filename));
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('fileContent').value = data.content;
+        } else {
+          showAlert('fileAlert', 'error', data.message);
+        }
+      } catch (e) {
+        showAlert('fileAlert', 'error', '加载失败: ' + e.message);
+      }
+    }
+
+    // 保存文件
+    async function saveFile() {
+      if (!currentEditFile) {
+        showAlert('fileAlert', 'error', '请先选择要编辑的文件');
+        return;
+      }
+      
+      const content = document.getElementById('fileContent').value;
+      
+      try {
+        const res = await fetch('/admin/api.php?action=saveFile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ file: currentEditFile, content })
+        });
+        const data = await res.json();
+        showAlert('fileAlert', data.success ? 'success' : 'error', data.message);
+      } catch (e) {
+        showAlert('fileAlert', 'error', '保存失败: ' + e.message);
+      }
+    }
+
+    // 加载所有订单
+    async function loadAllOrders() {
+      try {
+        const res = await fetch('/api/orders?pageSize=100');
+        const data = await res.json();
+        const tbody = document.getElementById('allOrders');
+        tbody.innerHTML = data.data.map(o => `
+          <tr>
+            <td style="font-family: monospace; font-size: 11px">${o.id}</td>
+            <td>${new Date(o.timestamp).toLocaleString('zh-CN')}</td>
+            <td>${getTypeName(o.type)}</td>
+            <td>${o.userName}</td>
+            <td><span style="color: #27ae60">✓ ${o.status}</span></td>
+            <td><button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px" onclick="deleteOrder('${o.id}')">删除</button></td>
+          </tr>
+        `).join('') || '<tr><td colspan="6">暂无订单</td></tr>';
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 删除订单
+    async function deleteOrder(orderId) {
+      if (!confirm('确定删除这条订单？')) return;
+      
+      try {
+        const res = await fetch('/admin/api.php?action=deleteOrder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadAllOrders();
+        } else {
+          alert(data.message);
+        }
+      } catch (e) {
+        alert('删除失败: ' + e.message);
+      }
+    }
+
+    // 清空订单
+    async function clearOrders() {
+      if (!confirm('⚠️ 确定清空所有订单？此操作不可恢复！')) return;
+      
+      try {
+        const res = await fetch('/admin/api.php?action=clearOrders', { method: 'POST' });
+        const data = await res.json();
+        alert(data.message);
+        if (data.success) {
+          loadDashboard();
+          loadAllOrders();
+        }
+      } catch (e) {
+        alert('操作失败: ' + e.message);
+      }
+    }
+
+    // 测试API
+    async function testAPI() {
+      const resultDiv = document.getElementById('testResult');
+      resultDiv.innerHTML = '<p style="color: #999; margin-top: 10px">测试中...</p>';
+      
+      try {
+        const res = await fetch('/admin/api.php?action=testAPI');
+        const data = await res.json();
+        resultDiv.innerHTML = `<p style="color: ${data.success ? '#27ae60' : '#e74c3c'}; margin-top: 10px">${data.message}</p>`;
+      } catch (e) {
+        resultDiv.innerHTML = `<p style="color: #e74c3c; margin-top: 10px">测试失败: ${e.message}</p>`;
+      }
+    }
+
+    // 工具函数
+    function getTypeName(type) {
+      const map = { bazi: '八字', name: '姓名', dream: '解梦' };
+      return map[type] || type;
+    }
+
+    function showAlert(containerId, type, message) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      setTimeout(() => container.innerHTML = '', 5000);
+    }
+
+    // 卡密管理函数
+    async function loadCardkeys() {
+      try {
+        const res = await fetch('/admin/api.php?action=listCardkeys');
+        const data = await res.json();
+        const tbody = document.getElementById('cardkeyList');
+        
+        if (data.success && data.cardkeys.length > 0) {
+          tbody.innerHTML = data.cardkeys.map(ck => `
+            <tr>
+              <td style="font-family: monospace; font-size: 13px; font-weight: bold;">${ck.cardkey}</td>
+              <td>${ck.typeName}</td>
+              <td><span style="color: ${ck.status === 'active' ? '#27ae60' : '#999'}">${ck.status === 'active' ? '未使用' : '已使用'}</span></td>
+              <td>${ck.expiresAt || '永久'}</td>
+              <td>${ck.activatedAt || '-'}</td>
+              <td>
+                <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px" onclick="deleteCardkey('${ck.cardkey}')" ${ck.status === 'used' ? 'disabled' : ''}>删除</button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6">暂无卡密</td></tr>';
+        }
+      } catch (e) {
+        console.error(e);
+        document.getElementById('cardkeyList').innerHTML = '<tr><td colspan="6">加载失败</td></tr>';
+      }
+    }
+
+    async function generateCardkeys() {
+      const type = document.getElementById('cardkeyType').value;
+      const count = parseInt(document.getElementById('cardkeyCount').value);
+      
+      if (count < 1 || count > 100) {
+        showAlert('cardkeyAlert', 'error', '数量必须在1-100之间');
+        return;
+      }
+      
+      try {
+        const res = await fetch('/admin/api.php?action=generateCardkeys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, count })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showAlert('cardkeyAlert', 'success', `成功生成${count}个卡密！`);
+          loadCardkeys();
+          
+          // 显示生成的卡密列表
+          const cardkeysText = data.cardkeys.join('\n');
+          prompt('卡密已生成，请复制保存：', cardkeysText);
+        } else {
+          showAlert('cardkeyAlert', 'error', data.message);
+        }
+      } catch (e) {
+        showAlert('cardkeyAlert', 'error', '生成失败: ' + e.message);
+      }
+    }
+
+    async function deleteCardkey(cardkey) {
+      if (!confirm('确定删除这个卡密？')) return;
+      
+      try {
+        const res = await fetch('/admin/api.php?action=deleteCardkey', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cardkey })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          showAlert('cardkeyAlert', 'success', '删除成功');
+          loadCardkeys();
+        } else {
+          showAlert('cardkeyAlert', 'error', data.message);
+        }
+      } catch (e) {
+        showAlert('cardkeyAlert', 'error', '删除失败: ' + e.message);
+      }
+    }
+
+    // 工具函数
+    function getTypeName(type) {
+      const map = { bazi: '八字', name: '姓名', dream: '解梦' };
+      return map[type] || type;
+    }
+
+    function showAlert(containerId, type, message) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      setTimeout(() => container.innerHTML = '', 5000);
+    }
+
+    // 登录相关
+    async function checkAuthStatus() {
+      try {
+        const res = await fetch('/admin/api.php?action=checkAuth');
+        const data = await res.json();
+        
+        if (data.loggedIn) {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('mainScreen').style.display = 'block';
+          loadDashboard();
+        } else {
+          document.getElementById('loginScreen').style.display = 'flex';
+          document.getElementById('mainScreen').style.display = 'none';
+        }
+      } catch (e) {
+        console.error('检查登录状态失败:', e);
+      }
+    }
+
+    async function adminLogin(e) {
+      e.preventDefault();
+      const password = document.getElementById('adminPassword').value;
+      const loginBtn = document.getElementById('loginBtn');
+      const errorEl = document.getElementById('loginError');
+      
+      loginBtn.disabled = true;
+      loginBtn.textContent = '登录中...';
+      errorEl.textContent = '';
+      
+      try {
+        const res = await fetch('/admin/api.php?action=login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+          document.getElementById('loginScreen').style.display = 'none';
+          document.getElementById('mainScreen').style.display = 'block';
+          loadDashboard();
+        } else {
+          errorEl.textContent = data.message || '登录失败';
+          loginBtn.disabled = false;
+          loginBtn.textContent = '登录';
+        }
+      } catch (e) {
+        errorEl.textContent = '网络错误: ' + e.message;
+        loginBtn.disabled = false;
+        loginBtn.textContent = '登录';
+      }
+    }
+
+    async function adminLogout() {
+      if (!confirm('确定退出登录？')) return;
+      
+      try {
+        await fetch('/admin/api.php?action=logout');
+        location.reload();
+      } catch (e) {
+        alert('退出失败');
+      }
+    }
+
+    // 初始化
+    checkAuthStatus();
+  </script>
+  </div><!-- 关闭 mainScreen -->
+</body>
+</html>

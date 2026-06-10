@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>玄象 · 一念一玄象，一算一乾坤</title>
+  <link rel="stylesheet" href="/shared/styles-v4.css">
+  <script defer src="/frontend/app-v4-cardkey.js?v=4"></script>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="logo-area">
+        <h1 class="brand-logo">玄象</h1>
+        <p class="brand-subtitle">X · U · A · N · X · I · A · N · G</p>
+      </div>
+      <nav class="nav-links">
+        <a href="#charity" class="nav-link charity-link" onclick="showCharityModal(); return false;">💝 公益捐赠</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero区域 -->
+  <section class="hero-section">
+    <h2 class="hero-title">一念一玄象，一算一乾坤</h2>
+    <p class="hero-stats">
+      <span>自开站以来，已有 </span>
+      <strong id="totalUsers">0</strong>
+      <span> 位道友在玄象探索命理智慧</span>
+    </p>
+    <div class="hero-disclaimer">
+      ✦ 玄象致力于以AI技术传承中华传统文化 · 命理仅供参考娱乐 · 人生在于自我把握 ✦
+    </div>
+  </section>
+
+  <!-- 搜索栏 -->
+  <div class="search-container">
+    <input 
+      type="text" 
+      id="searchInput" 
+      class="search-box" 
+      placeholder="🔍 搜索工具 / 标签 / 关键词…"
+      autocomplete="off"
+    />
+  </div>
+
+  <!-- 用户好评 -->
+  <section class="reviews-section">
+    <div class="reviews-container">
+      <div class="review-item">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">"八字分析很准，AI解读角度很新颖，比传统算命馆详细多了"</p>
+        <p class="review-author">— 李女士</p>
+      </div>
+      <div class="review-item">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">"周公解梦帮我分析了困扰很久的梦境，心理陪伴功能很温暖"</p>
+        <p class="review-author">— 张先生</p>
+      </div>
+      <div class="review-item">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">"给宝宝起名用的，结合八字和五格，很专业，¥29.9超值"</p>
+        <p class="review-author">— 王妈妈</p>
+      </div>
+      <!-- 重复以实现无缝滚动 -->
+      <div class="review-item">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">"八字分析很准，AI解读角度很新颖，比传统算命馆详细多了"</p>
+        <p class="review-author">— 李女士</p>
+      </div>
+      <div class="review-item">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">"周公解梦帮我分析了困扰很久的梦境，心理陪伴功能很温暖"</p>
+        <p class="review-author">— 张先生</p>
+      </div>
+      <div class="review-item">
+        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <p class="review-text">"给宝宝起名用的，结合八字和五格，很专业，¥29.9超值"</p>
+        <p class="review-author">— 王妈妈</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主功能卡片网格 -->
+  <main class="tools-grid">
+    
+    <!-- 奇门遁甲 -->
+    <article class="tool-card" data-service="qimen" onclick="navigateToService('qimen')">
+      <div class="card-header">
+        <span class="card-icon">⛩</span>
+        <h3 class="card-title">奇门遁甲</h3>
+        <button class="info-btn" onclick="showServiceInfo('qimen', event)">ℹ️</button>
+      </div>
+      <p class="card-desc">按当前时空起局，观测问题趋势与行动取舍</p>
+      <div class="card-footer">
+        
+        <span class="service-badge">AI调教</span>
+      </div>
+    </article>
+
+    <!-- 八字排盘 -->
+    <article class="tool-card" data-service="bazi" onclick="navigateToService('bazi')">
+      <div class="card-header">
+        <span class="card-icon">☯</span>
+        <h3 class="card-title">八字排盘</h3>
+        <button class="info-btn" onclick="showServiceInfo('bazi', event)">ℹ️</button>
+      </div>
+      <p class="card-desc">依据出生信息排四柱，查看流年、姻缘、财运</p>
+      <div class="card-footer">
+        
+        <span class="service-badge">AI调教</span>
+      </div>
+    </article>
+
+    <!-- 紫微斗数 -->
+    <article class="tool-card" data-service="ziwei" onclick="navigateToService('ziwei')">
+      <div class="card-header">
+        <span class="card-icon">✨</span>
+        <h3 class="card-title">紫微斗数</h3>
+        <button class="info-btn" onclick="showServiceInfo('ziwei', event)">ℹ️</button>
+      </div>
+      <p class="card-desc">生成紫微命盘，结合十二宫位与星曜做文化解读</p>
+      <div class="card-footer">
+        
+        <span class="service-badge">AI调教</span>
+      </div>
+    </article>
+
+    <!-- 周公解梦 -->
+    <article class="tool-card" data-service="dream" onclick="navigateToService('dream')">
+      <div class="card-header">
+        <span class="card-icon">🌙</span>
+        <h3 class="card-title">周公解梦</h3>
+        <button class="info-btn" onclick="showServiceInfo('dream', event)">ℹ️</button>
+      </div>
+      <p class="card-desc">结合梦境细节与传统梦象，生成梦境文化解读</p>
+      <div class="card-footer">
+        
+        <span class="service-badge">AI调教</span>
+      </div>
+    </article>
+
+    <!-- 起名测名 -->
+    <article class="tool-card" data-service="naming" onclick="navigateToService('naming')">
+      <div class="card-header">
+        <span class="card-icon">📝</span>
+        <h3 class="card-title">起名测名</h3>
+        <button class="info-btn" onclick="showServiceInfo('naming', event)">ℹ️</button>
+      </div>
+      <p class="card-desc">以八字喜用神为主、三才五格为辅，为宝宝起名</p>
+      <div class="card-footer">
+        
+        <span class="service-badge">AI调教</span>
+      </div>
+    </article>
+
+    <!-- 心理陪伴 -->
+    <article class="tool-card" data-service="psychology" onclick="navigateToService('psychology')">
+      <div class="card-header">
+        <span class="card-icon">💗</span>
+        <h3 class="card-title">心理陪伴</h3>
+        <button class="info-btn" onclick="showServiceInfo('psychology', event)">ℹ️</button>
+      </div>
+      <p class="card-desc">温暖倾听，情绪陪伴，提供心理支持与生活建议</p>
+      <div class="card-footer">
+        
+        <span class="service-badge new-badge">NEW</span>
+      </div>
+    </article>
+
+    <!-- 传统文化宝库 -->
+    <article class="tool-card special-card" onclick="navigateToKnowledge()">
+      <div class="card-header">
+        <span class="card-icon">📚</span>
+        <h3 class="card-title">传统文化宝库</h3>
+      </div>
+      <p class="card-desc">系统整理奇门、八字、紫微等传统文化知识文章</p>
+      <div class="card-footer">
+        <span class="service-cost">完全免费</span>
+      </div>
+    </article>
+
+    <!-- 微信交流 -->
+    <article class="tool-card special-card" onclick="showWechatModal()">
+      <div class="card-header">
+        <span class="card-icon">💬</span>
+        <h3 class="card-title">微信交流</h3>
+      </div>
+      <p class="card-desc">纯粹的学术与技术交流，可扫码添加微信并注明来意</p>
+      <div class="card-footer">
+        <span class="service-cost">学术交流</span>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="site-footer">
+    <p>© 玄象 · 命理仅供参考，人生在于自我把握</p>
+    <p class="footer-disclaimer">内容由 AI 生成，本平台解读仅供参考娱乐，不构成任何人生决策建议</p>
+    <p class="footer-tech">
+      <a href="../admin/" class="admin-link">管理后台</a>
+      <span class="divider">·</span>
+      <span id="moduleStatus">模块加载中...</span>
+    </p>
+  </footer>
+
+  <!-- 首次访问弹窗 -->
+  <div id="welcomeModal" class="modal welcome-modal" style="display:none;">
+    <div class="modal-content welcome-content">
+      <h2 class="modal-title">✦ 致每一位访客 ✦</h2>
+      
+      <div class="welcome-text">
+        <p>玄象致力于以现代AI技术传承中华传统文化瑰宝——涵盖八字命理、姓名学、周公解梦等传统术数，皆为中华先民观察人事、体察心象的智慧结晶。</p>
+        
+        <p>站内所有 AI 输出仅供娱乐参考，不构成任何人生、健康、财务、婚恋等决策建议。<strong>开心第一，命运在己</strong>。</p>
+        
+        <p class="welcome-signature">一念一玄象 · 一算一乾坤</p>
+        <p class="welcome-signature">愿你借此一窥古人智慧，归来仍是自己</p>
+      </div>
+      
+      <button class="modal-btn-primary" onclick="document.getElementById('welcomeModal').style.display='none'">我已阅读并同意</button>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>玄象远程更新工具</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 { margin-bottom: 10px; text-align: center; color: #333; }
+    .subtitle { text-align: center; color: #999; margin-bottom: 30px; font-size: 14px; }
+    .step {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .step h3 { color: #667eea; margin-bottom: 15px; }
+    .input-group { margin-bottom: 15px; }
+    .input-group label { display: block; margin-bottom: 5px; color: #666; font-size: 14px; font-weight: 500; }
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .log {
+      background: #1e1e1e;
+      color: #0f0;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+      display: none;
+    }
+    .log.show { display: block; }
+    .log div { margin-bottom: 5px; }
+    .success { color: #0f0; }
+    .error { color: #f00; }
+    .info { color: #0af; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 玄象远程更新工具</h1>
+    <p class="subtitle">一键从本地推送更新到服务器</p>
+
+    <div class="step">
+      <h3>📦 第1步：上传更新包</h3>
+      <div class="input-group">
+        <label>选择 ZIP 文件</label>
+        <input type="file" id="zipFile" accept=".zip" />
+      </div>
+    </div>
+
+    <div class="step">
+      <h3>🔗 第2步：配置服务器</h3>
+      <div class="input-group">
+        <label>服务器地址</label>
+        <input type="text" id="serverUrl" value="http://ai.olbaba.com" placeholder="http://ai.olbaba.com" />
+      </div>
+      <div class="input-group">
+        <label>更新密钥（首次需在服务器设置）</label>
+        <input type="password" id="updateKey" value="xuanxiang2026" placeholder="设置一个更新密钥" />
+      </div>
+    </div>
+
+    <button class="btn" id="updateBtn" onclick="startUpdate()">🚀 开始更新</button>
+
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    function addLog(msg, type = 'info') {
+      const log = document.getElementById('log');
+      log.classList.add('show');
+      const div = document.createElement('div');
+      div.className = type;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    async function startUpdate() {
+      const zipFile = document.getElementById('zipFile').files[0];
+      const serverUrl = document.getElementById('serverUrl').value.trim();
+      const updateKey = document.getElementById('updateKey').value.trim();
+      const btn = document.getElementById('updateBtn');
+
+      if (!zipFile) {
+        alert('请选择ZIP文件');
+        return;
+      }
+
+      if (!serverUrl || !updateKey) {
+        alert('请填写服务器地址和更新密钥');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = '⏳ 更新中...';
+      document.getElementById('log').innerHTML = '';
+
+      try {
+        addLog('开始上传更新包...', 'info');
+        
+        const formData = new FormData();
+        formData.append('file', zipFile);
+        formData.append('key', updateKey);
+
+        const res = await fetch(`${serverUrl}/update.php`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          addLog('✓ 文件上传成功', 'success');
+          addLog('✓ 正在备份数据...', 'info');
+          addLog('✓ 正在解压文件...', 'info');
+          addLog('✓ 正在更新代码...', 'info');
+          addLog('✓ 更新完成！', 'success');
+          addLog('', 'info');
+          addLog('可以访问网站了：' + serverUrl, 'success');
+          btn.textContent = '✅ 更新成功';
+        } else {
+          addLog('✗ 更新失败: ' + data.message, 'error');
+          btn.textContent = '❌ 更新失败';
+          btn.disabled = false;
+        }
+      } catch (e) {
+        addLog('✗ 网络错误: ' + e.message, 'error');
+        btn.textContent = '❌ 更新失败';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
