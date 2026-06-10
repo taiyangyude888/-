@@ -153,7 +153,14 @@ async function submitAnalysis(url, data, form) {
       body: JSON.stringify(data)
     });
     
-    const result = await res.json();
+    const text = await res.text();
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch (e) {
+      console.error('服务器返回:', text);
+      throw new Error('服务器返回格式错误，请检查后台配置');
+    }
     
     if (result.success) {
       resultDiv.innerHTML = `
