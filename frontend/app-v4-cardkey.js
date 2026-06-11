@@ -323,14 +323,7 @@ async function submitAnalysis(url, data, form, serviceKey) {
       body: JSON.stringify(data)
     });
     
-    const text = await res.text();
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch (e) {
-      console.error('服务器返回:', text);
-      throw new Error('服务器返回格式错误，请检查后台配置');
-    }
+    const result = await res.json();
     
     if (result.success) {
       // 记录使用次数（仅免费用户）
